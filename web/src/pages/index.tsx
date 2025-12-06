@@ -26,7 +26,7 @@ export default function Home() {
     }, []);
 
     return (
-        <Layout title="AI Humanoid Robotics Book" description="An interactive guide to AI and humanoid robotics.">
+        <Layout>
             <main>
                 <Book pages={pages} />
                 <FloatingChat />
