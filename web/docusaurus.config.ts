@@ -81,15 +81,16 @@ const config: Config = {
         src: 'img/logo.svg',
       },
       items: [
+        {to: '/', label: 'Read Book', position: 'left'}, // New: Read Book link
         {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
           label: 'Modules',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+
         {
-          href: 'https://github.com/Rvwaqas/AI-Humanoid-Robotics',
+          href: 'https://github.com/Rvwaqas/AI-Humanoid-Romotics',
           label: 'GitHub',
           position: 'right',
         },
@@ -103,7 +104,7 @@ const config: Config = {
           items: [
             {
               label: 'Modules',
-              to: '/docs/intro',
+              to: '/docs/module-1-ros2/intro',
             },
           ],
         },
@@ -127,13 +128,10 @@ const config: Config = {
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
+
             {
               label: 'GitHub',
-              href: 'https://github.com/Rvwaqas/AI-Humanoid-Robotics',
+              href: 'https://github.com/Rvwaqas/AI-Humanoid-Romotics',
             },
           ],
         },

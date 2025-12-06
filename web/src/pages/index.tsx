@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import Layout from '@theme/Layout';
 import Book from '../components/Book/Book';
 import FloatingChat from '../components/FloatingChat';
+import CoverPage from '../components/CoverPage'; // Import CoverPage
 
 const bookFiles = [
     '/docs/module-1-ros2/intro.md',
@@ -13,6 +15,8 @@ const bookFiles = [
 
 export default function Home() {
     const [pages, setPages] = useState([]);
+    const [showCover, setShowCover] = useState(true);
+    const history = useHistory(); // Initialize useHistory
 
     useEffect(() => {
         const fetchPages = async () => {
@@ -25,12 +29,21 @@ export default function Home() {
         fetchPages();
     }, []);
 
+    const handleStartReading = () => {
+        setShowCover(false);
+        history.push('/docs/module-1-ros2/intro'); // Navigate to the first module
+    };
+
     return (
-        <Layout>
-            <main>
-                <Book pages={pages} />
-                <FloatingChat />
-            </main>
+        <Layout> {/* Removed title and description props from Layout */}
+            {showCover ? (
+                <CoverPage onStartReading={handleStartReading} />
+            ) : (
+                <main>
+                    <Book pages={pages} />
+                    <FloatingChat />
+                </main>
+            )}
         </Layout>
     );
 }
