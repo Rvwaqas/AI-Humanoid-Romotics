@@ -1,105 +1,117 @@
-# Implementation Plan: AI-Humanoid-Robotics Book
+# Implementation Plan: AI Humanoid Robotics Book
 
-**Branch**: `001-ai-humanoid-robotics-book` | **Date**: 2025-12-06 | **Spec**: specs/001-ai-humanoid-robotics-book/spec.md
-**Input**: Feature specification from `/specs/001-ai-humanoid-robotics-book/spec.md`
-
-**Note**: This template is filled in by the `/sp.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Branch**: `001-ai-humanoid-robotics-book`
+**Date**: 2025-12-06
+**Spec**: [G:\Hackathon_Qtr_04\AI-Humanoid-Robotics\specs\001-ai-humanoid-robotics-book\spec.md](G:\Hackathon_Qtr_04\AI-Humanoid-Robotics\specs\001-ai-humanoid-robotics-book\spec.md)
 
 ## Summary
 
-This project aims to deliver a comprehensive guide and development environment for AI-Humanoid Robotics. It involves creating an interactive Docusaurus-based online textbook, a FastAPI backend providing RAG-powered chatbot, personalization, and translation features, and a React frontend to integrate these functionalities. The deployment will be managed via GitHub Actions to GitHub Pages for the frontend and Render for the backend.
+This project will create a comprehensive guide to AI-Humanoid Robotics, delivered as an interactive online book. The project includes a Docusaurus-based frontend (with a custom book-like UI), a FastAPI backend with a RAG pipeline for interactive Q&A, and features for content personalization and translation.
 
 ## Technical Context
 
-**Language/Version**: Python 3.11 (for backend), TypeScript/JavaScript (for frontend)  
-**Primary Dependencies**: FastAPI, Uvicorn, OpenAI SDK, Qdrant client, SQLAlchemy, Neon Postgres, Better-Auth, Docusaurus, React, `mcp-server-git`.  
-**Storage**: Neon (Serverless Postgres) for user profiles and authentication data; Qdrant Cloud for vector embeddings of book content.  
-**Testing**: NEEDS CLARIFICATION (No specific testing frameworks or strategies were defined in the user's plan)  
-**Target Platform**: Web (Docusaurus/React frontend), Linux server (FastAPI backend).  
-**Project Type**: Web application (frontend + backend).  
-**Performance Goals**: Chatbot response time under 3 seconds (SC-005), Ingestion script processes 1MB markdown within 60 seconds (SC-006).  
-**Constraints**: RAG chatbot must answer questions based *only* on the book's content (FR-004).  
-**Scale/Scope**: Comprehensive guide and development environment for AI-Humanoid Robotics, covering Docusaurus documentation, FastAPI backend with RAG, and React frontend.
+**Language/Version**: Python 3.11, TypeScript (ES2022)
+**Primary Dependencies**: FastAPI, Docusaurus 3.x, React, OpenAI SDK, Qdrant, SQLAlchemy, Better-Auth
+**Storage**: Neon (Serverless Postgres)
+**Testing**: pytest, Vitest
+**Target Platform**: Web (GitHub Pages for frontend, Render.com for backend)
+**Project Type**: Web application (frontend + backend)
+**Performance Goals**: <3s response time for chat and personalization APIs.
+**Constraints**: All AI-generated content must be based solely on the book's content.
+**Scale/Scope**: 10k users, ~100 pages of book content.
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-- [x] **Spec-Driven Development**: The plan aligns with the feature specification.
-- [x] **Syllabus Adherence**: The content generation phase explicitly covers the required syllabus modules.
-- [x] **Interactive Features Integration**: The plan incorporates Smart Auth, RAG Chatbot, Personalization, and Translation features.
-- [x] **Deployment Readiness**: The plan includes GitHub Actions for GitHub Pages and Render for backend deployment.
-- [ ] **Technology Stack (Immutable)**: (No new technologies introduced outside the specified stack, existing stack is respected).
+*   **Spec-Driven Development**: Adherence to `spec.md` and `plan.md` is mandatory.
+*   **Syllabus Adherence**: Content must align with the defined syllabus.
+*   **Interactive Features Integration**: "Magic Buttons" and RAG Chatbot are core features.
+*   **Deployment Readiness**: Target platforms are GitHub Pages and Render.
+*   **Technology Stack**: The tech stack is immutable and must be followed.
+*   **Development Workflow**: Code reviews, automated testing, CI/CD, and semantic versioning are required.
 
 ## Project Structure
 
-### Documentation (this feature)
+### Documentation
 
 ```text
 specs/001-ai-humanoid-robotics-book/
-├── plan.md              # This file (/sp.plan command output)
-├── research.md          # Phase 0 output (/sp.plan command)
-├── data-model.md        # Phase 1 output (/sp.plan command)
-├── quickstart.md        # Phase 1 output (/sp.plan command)
-├── contracts/           # Phase 1 output (/sp.plan command)
-└── tasks.md             # Phase 2 output (/sp.tasks command - NOT created by /sp.plan)
+├── plan.md
+├── research.md
+├── data-model.md
+├── quickstart.md
+├── contracts/
+└── tasks.md
 ```
 
-### Source Code (repository root)
+### Source Code
 
 ```text
 backend/
 ├── src/
-│   ├── models/             # For User profile, etc.
-│   ├── services/           # Authentication, RAG, Personalization, Translation logic
-│   └── api/                # FastAPI endpoints
-├── ingestion_script.py     # Script for reading docs and uploading embeddings
+│   ├── models/
+│   ├── services/
+│   └── api/
 └── tests/
 
 web/
 ├── src/
-│   ├── components/         # React components (e.g., SignupModal, SmartComponents, ChatWidget)
+│   ├── components/
+│   │   ├── Book/
+│   │   │   ├── Book.tsx
+│   │   │   ├── Page.tsx
+│   │   │   └── styles.module.css
+│   │   ├── ChapterToolbar.tsx
+│   │   ├── FloatingChat.tsx
+│   │   └── SignupModal.tsx
 │   ├── pages/
-│   └── docs/               # Docusaurus markdown content for the book modules
-├── sidebars.ts             # Docusaurus sidebar configuration
+│   └── theme/
 └── tests/
-
-scripts/validate_content.py # Agent skill script
-.github/workflows/          # GitHub Actions for CI/CD
-render.yaml                 # Render.com deployment configuration
-requirements.txt            # Backend Python dependencies
 ```
 
-**Structure Decision**: The project will adopt a monorepo structure with a `backend/` directory for the FastAPI application and a `web/` directory for the Docusaurus/React frontend, alongside shared `scripts/` and deployment configuration files.
+**Structure Decision**: A standard web application structure with a separate `frontend` and `backend` directory is chosen to maintain a clear separation of concerns.
 
-## Phases
+## Phase 1: Environment & Scaffolding
 
-### Phase 1: Infrastructure & Scaffolding
-1. Initialize Docusaurus project in `/web`.
-2. Initialize FastAPI project in `/backend`.
-3. Configure `mcp-server-git` for version control.
-4. Create `requirements.txt` for backend (fastapi, uvicorn, openai, qdrant-client, sqlalchemy, database drivers).
+1.  Initialize Docusaurus in `/web`.
+2.  Initialize FastAPI in `/backend`.
+3.  Configure `mcp-server-git`.
+4.  Create `requirements.txt` (fastapi, uvicorn, openai, qdrant-client, sqlalchemy, asyncpg, better-auth).
 
-### Phase 2: Content Generation (The Book)
-1. Create `sidebars.ts` to reflect Modules 1-4.
-2. Write Module 1: Focus on ROS 2, Nodes, and URDF (`web/docs/module-1-ros2/*.md`).
-3. Write Module 2: Focus on Gazebo, Physics, and Unity (`web/docs/module-2-gazebo/*.md`).
-4. Write Module 3: Focus on NVIDIA Isaac Sim and Hardware Specs (RTX requirement) (`web/docs/module-3-isaac/*.md`).
-5. Write Module 4: Focus on VLA, Whisper, and the Capstone (`web/docs/module-4-vla/*.md`).
+## Phase 2: Content Generation (The Book)
 
-### Phase 3: The Backend Brain (FastAPI)
-1. Auth System: Implement Better-Auth with the custom schema (`hardware_specs`, `coding_background`) using Neon Postgres.
-2. RAG System: Implement `/chat` endpoint using Qdrant and OpenAI.
-3. Features API: Implement `/personalize` and `/translate` endpoints.
-4. Ingestion: Create a script to read `web/docs/*.md` and upload embeddings to Qdrant.
+1.  **Sidebar:** Create `sidebars.ts` mapping Modules 1-4.
+2.  **Writing:** Generate content for all 4 modules.
+    *   **Constraint:** Ensure Module 3 explicitly covers the "Sim Rig" vs "Edge Brain" architecture defined in the prompt.
+3.  **Auditing:** Use the "Agent Skill" to verify hardware mentions in the text.
 
-### Phase 4: Frontend Intelligence (React)
-1. Auth UI: Create a Signup Modal that collects hardware/coding details.
-2. Interactive Toolbar: Create `SmartComponents.tsx` containing:
-   - Button: "Personalize for [User Role]"
-   - Button: "Translate to Urdu"
-3. Chat Widget: Embed a floating chat window that calls the `/chat` endpoint.
+## Phase 3: The "Brain" (Backend API)
 
-### Phase 5: Reusable Skills & Deployment
-1. Skill: Create the `validate_content` agent skill (`scripts/validate_content.py`).
-2. Deploy: Configure GitHub Actions for Pages and `render.yaml` for Backend.
+1.  **Database:** Setup Neon Postgres connection.
+2.  **Auth:** Implement Better-Auth routes (`/api/auth/*`).
+3.  **RAG Pipeline:**
+    *   Script: `scripts/ingest.py` to read Docs -> Qdrant.
+    *   Endpoint: `POST /chat` (Retrieves context -> OpenAI Answer).
+4.  **Transformation API:**
+    *   Endpoint: `POST /personalize` (Input: Text + User Profile -> Output: Rewritten Text).
+    *   Endpoint: `POST /translate` (Input: Text -> Output: Urdu Text).
+
+## Phase 4: The "Face" (Frontend Integration)
+
+1.  **Custom Book UI:**
+    *   Create a main `Book` component in `web/src/components/Book/Book.tsx`.
+    *   The `Book` component will manage the state of the current page and page-turning animations.
+    *   Create a `Page` component in `web/src/components/Book/Page.tsx` to render the content of a single page.
+    *   Style the components to resemble an open book with facing pages.
+2.  **Auth UI:** Create `SignupModal.tsx`. Fields: Email, Password, Hardware, Background.
+3.  **Smart Toolbar:** Create `ChapterToolbar.tsx` and integrate it into the `Book` component.
+    *   Connect "Personalize" button to `/personalize`.
+    *   Connect "Translate" button to `/translate`.
+4.  **Chat Widget:** Create `FloatingChat.tsx` and overlay it on the `Book` component.
+5.  **Content Integration:**
+    *   Fetch markdown content from the Docusaurus content pipeline.
+    *   Render the markdown content within the `Page` components.
+
+## Phase 5: Deployment
+
+1.  **Backend:** Create `render.yaml`.
+2.  **Frontend:** Configure `docusaurus.config.ts` for GitHub Pages.
