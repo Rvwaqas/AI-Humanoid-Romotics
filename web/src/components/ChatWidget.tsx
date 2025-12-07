@@ -1,113 +1,159 @@
+// web/src/components/BookChatbot.jsx - Copy to your Docusaurus
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './ChatWidget.module.css';
 
-interface ChatMessage {
-  type: 'user' | 'bot';
-  text: string;
-  sources?: { file_path: string; section_title: string; score: number }[];
-}
-
-const ChatWidget: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export default function BookChatbot() {
+  const [question, setQuestion] = useState('');
+  const [context, setContext] = useState('');
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const sendToBackend = async () => {
+    if (!question.trim()) return;
+    
+    setLoading(true);
+    const userMsg = { role: 'user', content: question, context };
+    
+    setMessages(prev => [...prev, userMsg]);
+    
+    try {
+      const res = await fetch('http://localhost:8000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, context })
+      });
+      
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'ai', content: data.answer, sources: data.sources }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'ai', content: '❌ Backend error. Run: cd backend && uv run uvicorn main:app --reload' }]);
+    }
+    
+    setQuestion('');
+    setContext('');
+    setLoading(false);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-
-    const userMessage: ChatMessage = { type: 'user', text: query };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setQuery('');
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('http://localhost:8000/api/chat/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: query }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const botMessage: ChatMessage = {
-        type: 'bot',
-        text: data.answer,
-        sources: data.source_sections,
-      };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-    } catch (e: any) {
-      setError(`Chat failed: ${e.message}`);
-      const errorMessage: ChatMessage = { type: 'bot', text: `Error: ${e.message}` };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
-    } finally {
-      setLoading(false);
+  const handleSelection = () => {
+    const text = window.getSelection().toString();
+    if (text) {
+      setContext(text);
+      textareaRef.current.focus();
     }
   };
 
+  useEffect(() => {
+    document.addEventListener('mouseup', handleSelection);
+    return () => document.removeEventListener('mouseup', handleSelection);
+  }, []);
+
   return (
-    <div className={clsx(styles.chatWidget, { [styles.open]: isOpen })}>
-      <button className={styles.toggleButton} onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? '-' : 'Chat'}
-      </button>
-      {isOpen && (
-        <div className={styles.chatWindow}>
-          <div className={styles.messagesContainer}>
-            {messages.map((msg, index) => (
-              <div key={index} className={clsx(styles.message, styles[msg.type])}>
-                <p>{msg.text}</p>
-                {msg.sources && msg.sources.length > 0 && (
-                  <div className={styles.sources}>
-                    <strong>Sources:</strong>
-                    <ul>
-                      {msg.sources.map((src, srcIndex) => (
-                        <li key={srcIndex}>
-                          {src.section_title} (Score: {src.score.toFixed(2)}) in {src.file_path}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ))}
-            {loading && <div className={styles.loading}>Bot is typing...</div>}
-            {error && <div className={styles.error}>Error: {error}</div>}
-            <div ref={messagesEndRef} />
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      width: '400px',
+      height: '500px',
+      background: 'white',
+      borderRadius: '15px',
+      boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+      display: 'flex',
+      flexDirection: 'column',
+      zIndex: 1000,
+      fontFamily: 'system-ui'
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: '20px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        borderRadius: '15px 15px 0 0',
+        textAlign: 'center'
+      }}>
+        <h3>🤖 Book AI Assistant</h3>
+        <small>Physical AI & RAG</small>
+      </div>
+
+      {/* Messages */}
+      <div style={{
+        flex: 1,
+        padding: '15px',
+        overflowY: 'auto',
+        background: '#f8f9fa'
+      }}>
+        {messages.length === 0 ? (
+          <div style={{textAlign: 'center', color: '#666', fontSize: '14px'}}>
+            💡 Select text on page or ask about book content<br/>
+            <small>Qdrant → Gemini → Answer</small>
           </div>
-          <form onSubmit={handleSendMessage} className={styles.inputContainer}>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ask about the book..."
-              disabled={loading}
-            />
-            <button type="submit" disabled={loading}>
-              Send
-            </button>
-          </form>
+        ) : (
+          messages.map((msg, i) => (
+            <div key={i} style={{
+              marginBottom: '15px',
+              padding: '12px',
+              borderRadius: '12px',
+              background: msg.role === 'user' ? '#007bff' : '#e9ecef',
+              color: msg.role === 'user' ? 'white' : 'black'
+            }}>
+              <strong>{msg.role === 'user' ? 'You' : 'AI'}:</strong> {msg.content}
+              {msg.sources && msg.sources.length > 0 && (
+                <div style={{fontSize: '12px', marginTop: '5px'}}>
+                  📚 Sources: {msg.sources.join(', ')}
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Input */}
+      <div style={{ padding: '15px', borderTop: '1px solid #eee' }}>
+        <textarea
+          ref={textareaRef}
+          value={context}
+          onChange={(e) => setContext(e.target.value)}
+          placeholder="📖 Selected text appears here (optional)"
+          rows={2}
+          style={{
+            width: '100%',
+            padding: '8px',
+            border: '1px solid #ddd',
+            borderRadius: '8px',
+            marginBottom: '8px',
+            resize: 'none',
+            fontSize: '14px'
+          }}
+        />
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Ask about book..."
+            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendToBackend())}
+            style={{
+              flex: 1,
+              padding: '10px',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              fontSize: '14px'
+            }}
+          />
+          <button
+            onClick={sendToBackend}
+            disabled={loading || !question.trim()}
+            style={{
+              padding: '10px 20px',
+              background: loading ? '#ccc' : '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {loading ? '🤔' : '🚀'}
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
-};
-
-export default ChatWidget;
+}

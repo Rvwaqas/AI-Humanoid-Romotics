@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './CoverPage.module.css';
 
+
 interface CoverPageProps {
   onStartReading: () => void;
 }

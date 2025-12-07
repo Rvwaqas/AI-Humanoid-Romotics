@@ -31,7 +31,7 @@ export default function Home() {
 
     const handleStartReading = () => {
         setShowCover(false);
-        history.push('/docs/module-1-ros2/intro'); // Navigate to the first module
+        history.push('/AI-Humanoid-Robotics/docs/module-1-ros2/intro'); // Navigate to the first module
     };
 
     return (
@@ -41,9 +41,9 @@ export default function Home() {
             ) : (
                 <main>
                     <Book pages={pages} />
-                    <FloatingChat />
                 </main>
             )}
+            <FloatingChat />
         </Layout>
     );
 }
