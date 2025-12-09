@@ -1,7 +1,7 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-
+import FloatingChat from './src/components/FloatingChat';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
@@ -135,6 +135,7 @@ const config: Config = {
             },
           ],
         },
+        
       ],
       copyright: `Copyright © ${new Date().getFullYear()} AI-Humanoid-Robotics Book, Inc. Built with Docusaurus.`,
     },

@@ -4,7 +4,6 @@ import Layout from '@theme/Layout';
 import Book from '../components/Book/Book';
 import FloatingChat from '../components/FloatingChat';
 import CoverPage from '../components/CoverPage'; // Import CoverPage
-
 const bookFiles = [
     '/docs/module-1-ros2/intro.md',
     '/docs/module-2-gazebo/sim.md',
@@ -15,7 +14,7 @@ const bookFiles = [
 
 export default function Home() {
     const [pages, setPages] = useState([]);
-    const [showCover, setShowCover] = useState(true);
+    const [showCover, setShowCover] = useState(false);
     const history = useHistory(); // Initialize useHistory
 
     useEffect(() => {
