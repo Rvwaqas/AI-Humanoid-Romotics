@@ -1,48 +1,83 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import Layout from '@theme/Layout';
-import Book from '../components/Book/Book';
-import FloatingChat from '../components/FloatingChat';
-import CoverPage from '../components/CoverPage'; // Import CoverPage
-const bookFiles = [
-    '/docs/module-1-ros2/intro.md',
-    '/docs/module-2-gazebo/sim.md',
-    '/docs/module-3-isaac/brain.md',
-    '/docs/module-3-isaac/hardware.md',
-    '/docs/module-4-vla/capstone.md'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import styles from './index.module.css';
+import Link from '@docusaurus/Link';
+
+function HomepageHeader() {
+  const {siteConfig} = useDocusaurusContext();
+  return (
+    <header className={styles.heroBanner}>
+      <div className="container">
+        <h1 className="hero__title">{siteConfig.title}</h1>
+        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <div className={styles.buttons}>
+          <Link
+            className="button button--secondary button--lg"
+            to="/docs/module-1-ros2/intro">
+            Start Reading - ⏱️ 5min
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+const features = [
+  {
+    title: 'ROS 2',
+    description: 'Learn the Robot Operating System 2 from scratch. Understand nodes, topics, services, and more.',
+  },
+  {
+    title: 'Gazebo',
+    description: 'Simulate your robots in a realistic 3D environment. Learn to create worlds and models.',
+  },
+  {
+    title: 'Isaac Sim',
+    description: 'Leverage the power of NVIDIA Isaac Sim for advanced robotics simulation and synthetic data generation.',
+  },
+  {
+    title: 'Vision-Language-Action (VLA)',
+    description: 'Explore the cutting-edge of AI with Vision-Language-Action models. Build a capstone project that sees, understands, and acts.',
+  },
 ];
 
-export default function Home() {
-    const [pages, setPages] = useState([]);
-    const [showCover, setShowCover] = useState(false);
-    const history = useHistory(); // Initialize useHistory
+function Feature({title, description}) {
+  return (
+    <div className="col col--3">
+      <div className="text--center padding-horiz--md">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
+    </div>
+  );
+}
 
-    useEffect(() => {
-        const fetchPages = async () => {
-            const fetchedPages = await Promise.all(
-                bookFiles.map(file => fetch(file).then(res => res.text()))
-            );
-            setPages(fetchedPages);
-        };
+function HomepageFeatures() {
+  return (
+    <section className={styles.features}>
+      <div className="container">
+        <div className="row">
+          {features.map((props, idx) => (
+            <Feature key={idx} {...props} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        fetchPages();
-    }, []);
-
-    const handleStartReading = () => {
-        setShowCover(false);
-        history.push('/docs/module-1-ros2/intro'); // Navigate to the first module
-    };
-
-    return (
-        <Layout> {/* Removed title and description props from Layout */}
-            {showCover ? (
-                <CoverPage onStartReading={handleStartReading} />
-            ) : (
-                <main>
-                    <Book pages={pages} />
-                    <FloatingChat />
-                </main>
-            )}
-        </Layout>
-    );
+export default function Home(): JSX.Element {
+  const {siteConfig} = useDocusaurusContext();
+  return (
+    <Layout
+      title={`Hello from ${siteConfig.title}`}
+      description="A comprehensive guide and development environment for AI-Humanoid Robotics">
+      <HomepageHeader />
+      <main>
+        <HomepageFeatures />
+      </main>
+    </Layout>
+  );
 }
