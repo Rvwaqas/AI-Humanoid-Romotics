@@ -9,8 +9,6 @@ router = APIRouter()
 @router.post("/signup")
 async def signup(user: UserCreate, db=Depends(get_db)):
     """Create user with username, email, password (psycopg)"""
-    print(f"Received signup request for user: {user.username}, email: {user.email}")
-    print(f"Password length: {len(user.password)}")
     try:
         async with db.cursor() as cur:
             await cur.execute(
@@ -23,8 +21,7 @@ async def signup(user: UserCreate, db=Depends(get_db)):
             if existing > 0:
                 raise HTTPException(status_code=400, detail="Email already registered!")
 
-            raw_password = user.password[:72]
-            hashed_password = get_password_hash(raw_password)
+            hashed_password = get_password_hash(user.password)
 
             await cur.execute(
                 """
@@ -48,7 +45,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get
     async with db.cursor() as cur:
         await cur.execute(
             "SELECT username, email, password FROM users WHERE email = %s",
-            (form_data.username,)
+            (form_data.username,) # form_data.username is the email from the form
         )
         row = await cur.fetchone()
 
