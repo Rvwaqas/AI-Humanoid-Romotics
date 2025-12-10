@@ -17,5 +17,5 @@ dependencies = [
     "uvicorn>=0.38.0",
 ]
 
-[tool.setuptools]
-py-modules = ["main", "ingest"]
+[tool.setuptools.packages.find]
+where = ["src"]
