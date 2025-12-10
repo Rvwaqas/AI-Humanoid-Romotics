@@ -1,50 +1,50 @@
 import React, { useState } from 'react';
-import styles from './SignupModal.module.css';
+import styles from './SignupModal.module.css'; // Reusing styles from SignupModal
 
-const SignupModal = ({ onClose }) => {
-    const [username, setUsername] = useState('');
+const LoginModal = ({ onClose, onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        setSuccess('');
+
+        const formData = new URLSearchParams();
+        formData.append('username', email);
+        formData.append('password', password);
 
         try {
-            const response = await fetch('http://localhost:8000/signup', {
+            const response = await fetch('http://localhost:8000/token', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({ username, email, password }),
+                body: formData,
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setSuccess(data.message);
+                onLoginSuccess(data.access_token);
+                onClose();
             } else {
                 const errorData = await response.json();
-                setError(errorData.detail || 'Signup failed');
+                setError(errorData.detail || 'Login failed');
             }
         } catch (err) {
-            setError('An error occurred during signup.');
+            setError('An error occurred during login.');
         }
     };
 
     return (
         <div className={styles.modalBackdrop}>
             <div className={styles.modalContent}>
-                <h2>Sign Up</h2>
+                <h2>Login</h2>
                 <form onSubmit={handleSubmit}>
-                    <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
                     <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
                     <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
                     {error && <p className={styles.error}>{error}</p>}
-                    {success && <p className={styles.success}>{success}</p>}
-                    <button type="submit">Sign Up</button>
+                    <button type="submit">Login</button>
                 </form>
                 <button onClick={onClose}>Close</button>
             </div>
@@ -52,4 +52,4 @@ const SignupModal = ({ onClose }) => {
     );
 };
 
-export default SignupModal;
+export default LoginModal;
