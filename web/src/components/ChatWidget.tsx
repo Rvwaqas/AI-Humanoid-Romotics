@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import styles from './ChatWidget.module.css';
 
-export default function PhysicalAIChatbot() {
+export default function PhysicalAIChatbot({ onClose }) {
   const [question, setQuestion] = useState('');
   const [context, setContext] = useState('');
   const [messages, setMessages] = useState([]);
@@ -8,12 +9,10 @@ export default function PhysicalAIChatbot() {
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Text selection → auto-fill context
   const handleTextSelection = () => {
     const selectedText = window.getSelection().toString().trim();
     if (selectedText && selectedText.length > 10) {
@@ -22,7 +21,6 @@ export default function PhysicalAIChatbot() {
     }
   };
 
-  // Send to backend (Hackathon RAG endpoint)
   const sendMessage = async () => {
     if (!question.trim() && !context.trim()) return;
 
@@ -64,7 +62,6 @@ export default function PhysicalAIChatbot() {
     scrollToBottom();
   };
 
-  // Enter to send
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -82,83 +79,33 @@ export default function PhysicalAIChatbot() {
   }, [messages]);
 
   return (
-    <div className="physical-ai-chatbot" style={{
-      position: 'fixed',
-      bottom: '20px',
-      right: '20px',
-      width: '420px',
-      height: '600px',
-      background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-      borderRadius: '20px',
-      boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-      display: 'flex',
-      flexDirection: 'column',
-      zIndex: 10000,
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      overflow: 'hidden'
-    }}>
-      {/* Header */}
-      <div style={{
-        padding: '20px',
-        background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-        color: 'white',
-        textAlign: 'center',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ fontSize: '24px', fontWeight: 'bold' }}>🤖 Physical AI Bot</div>
-        <div style={{ fontSize: '14px', opacity: 0.9 }}>ROS2 • Gazebo • Isaac Sim • VLA</div>
+    <div className={styles.chatbot}>
+      <div className={styles.header}>
+        <div>
+            <div className={styles.headerTitle}>🤖 Physical AI Bot</div>
+            <div className={styles.headerSubtitle}>ROS2 • Gazebo • Isaac Sim • VLA</div>
+        </div>
+        <button onClick={onClose} className={styles.closeButton}>×</button>
       </div>
 
-      {/* Messages */}
-      <div style={{
-        flex: 1,
-        padding: '20px',
-        overflowY: 'auto',
-        background: 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(10px)'
-      }}>
+      <div className={styles.messages}>
         {messages.length === 0 ? (
-          <div style={{
-            textAlign: 'center',
-            color: '#64748b',
-            padding: '40px 20px',
-            fontSize: '16px'
-          }}>
+          <div style={{ textAlign: 'center', color: '#64748b', padding: '40px 20px', fontSize: '16px' }}>
             💡 <strong>Select text</strong> on any page or <br/>
             ask about Physical AI, ROS2, Gazebo, Isaac Sim<br/><br/>
             <small>Powered by OpenAI Agents + Qdrant RAG</small>
           </div>
         ) : (
           messages.map((msg, index) => (
-            <div key={index} style={{
-              marginBottom: '16px',
-              padding: '16px 20px',
-              borderRadius: '18px',
-              maxWidth: '85%',
-              boxShadow: msg.role === 'user' 
-                ? '0 4px 12px rgba(59,130,246,0.3)' 
-                : '0 4px 12px rgba(0,0,0,0.1)',
-              background: msg.role === 'user' 
-                ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' 
-                : '#f8fafc',
-              color: msg.role === 'user' ? 'white' : '#1e293b',
-              marginLeft: msg.role === 'ai' ? '15%' : 'auto',
-              alignSelf: msg.role === 'ai' ? 'flex-start' : 'flex-end'
-            }}>
-              <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+            <div key={index} className={`${styles.message} ${msg.role === 'user' ? styles.userMessage : styles.aiMessage}`}>
+              <div className={styles.messageHeader}>
                 {msg.role === 'user' ? 'You' : 'Physical AI Bot'}
               </div>
-              <div style={{ lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+              <div className={styles.messageContent}>
                 {msg.content}
               </div>
               {msg.sources && msg.sources.length > 0 && (
-                <div style={{
-                  marginTop: '8px',
-                  padding: '8px',
-                  background: 'rgba(59,130,246,0.1)',
-                  borderRadius: '12px',
-                  fontSize: '12px'
-                }}>
+                <div style={{ marginTop: '8px', padding: '8px', background: 'rgba(59,130,246,0.1)', borderRadius: '12px', fontSize: '12px' }}>
                   📚 {msg.sources.join(' • ')}
                 </div>
               )}
@@ -173,64 +120,28 @@ export default function PhysicalAIChatbot() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div style={{
-        padding: '20px',
-        borderTop: '1px solid rgba(255,255,255,0.2)',
-        background: 'rgba(255,255,255,0.95)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px'
-      }}>
+      <div className={styles.inputArea}>
         <textarea
           ref={textareaRef}
           value={context}
           onChange={(e) => setContext(e.target.value)}
           placeholder="📖 Select text from book (auto-fills) or paste here..."
           rows={2}
-          style={{
-            width: '100%',
-            padding: '12px 16px',
-            border: '2px solid #e2e8f0',
-            borderRadius: '12px',
-            resize: 'none',
-            fontSize: '14px',
-            fontFamily: 'inherit',
-            background: 'white'
-          }}
+          className={styles.contextTextarea}
           onKeyPress={handleKeyPress}
         />
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className={styles.inputWrapper}>
           <input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Ask about ROS2, Gazebo, Isaac Sim..."
             onKeyPress={handleKeyPress}
-            style={{
-              flex: 1,
-              padding: '14px 18px',
-              border: '2px solid #e2e8f0',
-              borderRadius: '12px',
-              fontSize: '14px',
-              fontFamily: 'inherit'
-            }}
+            className={styles.questionInput}
           />
           <button
             onClick={sendMessage}
             disabled={loading || (!question.trim() && !context.trim())}
-            style={{
-              padding: '14px 24px',
-              background: loading 
-                ? '#94a3b8' 
-                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              minWidth: '80px'
-            }}
+            className={styles.sendButton}
           >
             {loading ? '🤔' : '🚀'}
           </button>

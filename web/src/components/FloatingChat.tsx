@@ -31,9 +31,7 @@ const FloatingChat = () => {
                 {isOpen ? 'Close Chat' : 'Open Chat'}
             </button>
             {isOpen && (
-                <div className={styles.chatWindow}>
-                    <ChatWidget />
-                </div>
+                <ChatWidget onClose={toggleChat} />
             )}
         </div>
     );

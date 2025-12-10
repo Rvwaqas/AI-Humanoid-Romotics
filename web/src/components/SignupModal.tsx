@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './SignupModal.module.css';
+import styles from './Modal.module.css';
 
 const SignupModal = ({ onClose }) => {
     const [username, setUsername] = useState('');
@@ -37,6 +37,7 @@ const SignupModal = ({ onClose }) => {
     return (
         <div className={styles.modalBackdrop}>
             <div className={styles.modalContent}>
+                <button onClick={onClose} className={styles.closeButton}>×</button>
                 <h2>Sign Up</h2>
                 <form onSubmit={handleSubmit}>
                     <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
@@ -46,7 +47,6 @@ const SignupModal = ({ onClose }) => {
                     {success && <p className={styles.success}>{success}</p>}
                     <button type="submit">Sign Up</button>
                 </form>
-                <button onClick={onClose}>Close</button>
             </div>
         </div>
     );

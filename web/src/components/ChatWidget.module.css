@@ -1,31 +1,140 @@
-.chatContainer {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
+.chatbot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  height: 500px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  z-index: 10000;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden;
 }
 
-.chatButton {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #007bff;
-    color: white;
+.header {
+  padding: 20px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerTitle {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.headerSubtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.closeButton {
+    background: none;
     border: none;
+    color: white;
+    font-size: 24px;
     cursor: pointer;
 }
 
-.chatWindow {
-    width: 300px;
-    height: 400px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
 }
 
-.messages {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
+.message {
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  max-width: 85%;
+}
+
+.userMessage {
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+.aiMessage {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: #f8fafc;
+  color: #1e293b;
+  margin-right: auto;
+  align-self: flex-start;
+}
+
+.messageHeader {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.messageContent {
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.inputArea {
+  padding: 20px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.95);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contextTextarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  resize: none;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 12px;
+}
+
+.questionInput {
+  flex: 1;
+  padding: 14px 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.sendButton {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.sendButton:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.thinkingIndicator {
+  /* Add styles for thinking indicator */
 }
